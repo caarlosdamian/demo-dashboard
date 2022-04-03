@@ -38,6 +38,37 @@ export const userColumns = [
   },
 ];
 
+
+
+
+export const ProductsColumns = [
+  { field: "id", headerName: "ID", width: 70 },
+  {
+    field: "product",
+    headerName: "Product",
+    width: 230,
+    renderCell: (params) => {
+      return (
+        <div className="cellWithImg">
+          <img className="cellImg" src={params.row.img} alt="avatar" />
+          {params.row.username}
+        </div>
+      );
+    },
+  },
+  {
+    field: "price",
+    headerName: "Price",
+    width: 230,
+  },
+
+  {
+    field: "stock",
+    headerName: "Stock",
+    width: 100,
+  },
+
+];
 //temporary data
 export const userRows = [
   {

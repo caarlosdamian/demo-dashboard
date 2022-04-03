@@ -2,7 +2,7 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useEffect, useState } from "react";
-import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc ,addDoc, collection} from "firebase/firestore";
 import "./new.scss";
 import { db, auth, storage } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
@@ -11,20 +11,21 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const New = ({ inputs, title }) => {
   const [file, setFile] = useState("");
   const [data, setData] = useState({});
   const [perc, setPerc] = useState(null);
   const navigate =useNavigate()
+  const {pathname} = useLocation()
+  const type = (pathname.replace('/',''))
 
   useEffect(() => {
     const uploadFile = () => {
       const name = new Date().getTime() + file.name;
 
-      console.log(name);
-      const storageRef = ref(storage, file.name);
+      const storageRef = ref(storage, name);
       const uploadTask = uploadBytesResumable(storageRef, file);
 
       uploadTask.on(
@@ -60,15 +61,25 @@ const New = ({ inputs, title }) => {
 
   const handleAdd = async (e) => {
     e.preventDefault();
-    const res = await createUserWithEmailAndPassword(
-      auth,
-      data.email,
-      data.password
-    );
-    await setDoc(doc(db, "users", res.user.uid), {
-      ...data,
-      timeStamp: serverTimestamp(),
-    });
+    if(type ==='users'){
+      const res = await createUserWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password
+      );
+      await setDoc(doc(db, "users", res.user.uid), {
+        ...data,
+        timeStamp: serverTimestamp(),
+      });
+    }else{
+      console.log('EJECTUS');
+      await addDoc(collection(db, 'products'), {
+        ...data,
+        timeStamp: serverTimestamp(),
+      });
+    }
+   
+  
     navigate(-1)
   };
 

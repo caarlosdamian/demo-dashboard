@@ -1,7 +1,7 @@
 import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { userColumns } from "../../datatablesource";
-import { Link } from "react-router-dom";
+import { ProductsColumns, userColumns } from "../../datatablesource";
+import { Link, useLocation } from "react-router-dom";
 import {
   collection,
   doc,
@@ -13,6 +13,9 @@ import { db } from "../../firebase";
 
 const Datatable = () => {
   const [data, setData] = useState([]);
+  const {pathname} = useLocation()
+ const type = (pathname.replace('/',''))
+  
   useEffect(() => {
     // const fetchData = async () => {
     //   let list = [];
@@ -26,7 +29,7 @@ const Datatable = () => {
     // };
     // fetchData();
     //LISTEN (REAL TIME)
-    const unsub = onSnapshot(collection(db, "users"), (snapshot) => {
+    const unsub = onSnapshot(collection(db, type), (snapshot) => {
       let list = [];
       snapshot.forEach((doc) => {
         list.push({ id: doc.id, ...doc.data() });
@@ -36,11 +39,11 @@ const Datatable = () => {
     return () => {
       unsub();
     };
-  }, []);
+  }, [type]);
 
   const handleDelete = async (id) => {
     try {
-      await deleteDoc(doc(db, "users", id));
+      await deleteDoc(doc(db, type, id));
       setData(data.filter((item) => item.id !== id));
     } catch (error) {
       console.log(error);
@@ -55,7 +58,7 @@ const Datatable = () => {
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <Link to={ `/users/${params.id}`} 
+            <Link to={ `/${type}/${params.id}`} 
               state={ params.row }
               style={{ textDecoration: "none" }}>
               <div className="viewButton">View</div>
@@ -75,14 +78,14 @@ const Datatable = () => {
     <div className="datatable">
       <div className="datatableTitle">
         Add New User
-        <Link to="/users/new" className="link">
+        <Link to={`/${type}/new`} className="link">
           Add New
         </Link>
       </div>
       <DataGrid
         className="datagrid"
         rows={data}
-        columns={userColumns.concat(actionColumn)}
+        columns={type === 'users'?    userColumns.concat(actionColumn): ProductsColumns.concat(actionColumn)}
         pageSize={9}
         rowsPerPageOptions={[9]}
         checkboxSelection
