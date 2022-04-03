@@ -1,10 +1,9 @@
 import "./datatable.scss";
 import { DataGrid } from "@mui/x-data-grid";
-import { userColumns, userRows } from "../../datatablesource";
+import { userColumns } from "../../datatablesource";
 import { Link } from "react-router-dom";
 import {
   collection,
-  getDocs,
   doc,
   deleteDoc,
   onSnapshot,
@@ -34,9 +33,9 @@ const Datatable = () => {
       });
       setData(list);
     });
-    return ()=>{
-      unsub()
-    }
+    return () => {
+      unsub();
+    };
   }, []);
 
   const handleDelete = async (id) => {
@@ -56,7 +55,9 @@ const Datatable = () => {
       renderCell: (params) => {
         return (
           <div className="cellAction">
-            <Link to="/users/test" style={{ textDecoration: "none" }}>
+            <Link to={ `/users/${params.id}`} 
+              state={ params.row }
+              style={{ textDecoration: "none" }}>
               <div className="viewButton">View</div>
             </Link>
             <div

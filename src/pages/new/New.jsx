@@ -2,12 +2,11 @@ import Sidebar from "../../components/sidebar/Sidebar";
 import Navbar from "../../components/navbar/Navbar";
 import DriveFolderUploadOutlinedIcon from "@mui/icons-material/DriveFolderUploadOutlined";
 import { useEffect, useState } from "react";
-import { addDoc, doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 import "./new.scss";
 import { db, auth, storage } from "../../firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import {
-  getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,

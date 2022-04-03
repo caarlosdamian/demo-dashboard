@@ -1,11 +1,11 @@
-import { useParams } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import Navbar from '../../components/navbar/Navbar'
 import Sidebar from '../../components/sidebar/Sidebar'
 import './single.scss'
 
 const Single = () => {
-  let params = useParams();
-  console.log(params)
+  let location = useLocation()
+  console.log(location)
   return (
     <div className='single'>
       <Sidebar/>
@@ -18,7 +18,7 @@ const Single = () => {
             </div>
             <h1 className="title">Information</h1>
             <div className="item">
-              <img src="https://images.pexels.com/photos/1820770/pexels-photo-1820770.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500" alt="" className="itemImg" />
+              <img src={location.state.img} alt="user" className="itemImg" />
             </div>
             details
           </div>

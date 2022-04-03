@@ -1,20 +1,26 @@
 import "./widget.scss";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined";
 import AccountBalanceWalletOutlinedIcon from "@mui/icons-material/AccountBalanceWalletOutlined";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import MonetizationOnOutlinedIcon from "@mui/icons-material/MonetizationOnOutlined";
+import { collection, query, where, getDocs } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useState, useEffect } from "react";
 const Widget = ({ type }) => {
+  const [amount, setAmount] = useState(null);
+  const [diff, setDiff] = useState(null);
   let data;
   // temporary
-  const amount = 100;
-  const diff = 200;
+
   switch (type) {
     case "user":
       data = {
         title: "USERS",
         isMoney: false,
         link: "See all users",
+        query: "users",
         icon: (
           <PersonOutlinedIcon
             className="icon"
@@ -58,8 +64,8 @@ const Widget = ({ type }) => {
     case "balance":
       data = {
         title: "BALANCE",
-        isMoney: true,
         link: "See details",
+        query: "products",
         icon: (
           <AccountBalanceWalletOutlinedIcon
             className="icon"
@@ -74,6 +80,35 @@ const Widget = ({ type }) => {
     default:
       break;
   }
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const today = new Date();
+      const lastMonth = new Date(new Date().setMonth(today.getMonth() - 1));
+      const prevMont = new Date(new Date().setMonth(today.getMonth() - 2));
+      const lastMonthQuery = query(
+        collection(db, data.query),
+        where("timeStamp", "<=", today),
+        where("timeStamp", ">", lastMonth)
+      );
+      const prevMonthQuery = query(
+        collection(db, data.query),
+        where("timeStamp", "<=", lastMonth),
+        where("timeStamp", ">", prevMont)
+      );
+
+      const lastMonthData = await getDocs(lastMonthQuery);
+      const prevMonthData = await getDocs(prevMonthQuery);
+      setAmount(lastMonthData.docs.length);
+      setDiff(
+        ((lastMonthData.docs.length - prevMonthData.docs.length) /
+          prevMonthData.docs.length) *
+          100
+      );
+    };
+    fetchData();
+  }, [data.query]);
+
   return (
     <div className="widget">
       <div className="left">
@@ -84,8 +119,8 @@ const Widget = ({ type }) => {
         <span className="link">{data?.link}</span>
       </div>
       <div className="right">
-        <div className="percentage positive">
-          <KeyboardArrowUpIcon /> {diff} %
+        <div className={`percentage ${diff < 0 ? "negative" : "positive"} `}>
+          {diff < 0 ? <KeyboardArrowDown /> : <KeyboardArrowUpIcon />} {diff} %
         </div>
         {data.icon}
       </div>
